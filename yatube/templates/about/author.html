@@ -1,0 +1,98 @@
+{% extends "base.html" %}
+{% load static %}
+{% block title %}Об авторе проекта{% endblock %}
+{% block content %}
+  <style>
+    .photo {
+      width: 425px;
+      height: 530px;
+    }
+  </style>
+  <div class="container py-4">
+    <h1>Author - Korobov Valery</h1>
+    <hr>
+    <p>
+      С детства мечтал стать программистом, даже начинал учиться в этом
+      направлении, но жизнь сложилась немного иначе, чем ожидалось и
+      планы пришлось отложить на неопределённый срок. Кажется я совсем
+      оставил идею стать программистом и полагал что это будет совсем
+      сложно, скучно, не интересно и долго по времени.
+    </p>
+    <p>
+      Наверное моя страсть к решению задач, а может рекомендации близких
+      и друзей подтолкнули к мысли о программировании, я почитал несколько
+      статей в интернете, начал снова играть в шахматы (шахматы - это круто)
+      и думал куда-нибудь вложить накопленные деньги, которые лежали просто
+      так и таяли от стабильной инфляции. Поигравшись немного
+      на фондовом рынке, я понял что казино - не совсем моя тема,
+      а сумма для вклада во что-то серьезное не такая уж и большая.
+      Тут решение пришло само собой, как пазл из совокупности
+      вышеупомянутых факторов сложилась полноценная картина...
+    </p>
+    <p>
+      ...я вложусь в собственное образование!
+      Самый оптимальный вариант! Пришлось просмотреть несколько 
+      образовательных площадок и я выбрал ту, которая дала возможность
+      пройти бесплатное обучение по профессии Python-разработчик.
+      Я начал изучать, углубляться в процесс написания кода и понимать,
+      что мне это нравится, иногда даже настолько, что я не замечаю,
+      как пролетает время. Параллельно с обучением, я делаю свой
+      собственный проект (интрига) и обязательно в скором времени опубликую
+      его.
+    </p>
+    <p>
+      В работе над проектами мне помогает горячий чаёк или маленькая чашка
+      ароматного кофе, люблю кофе. ☕️ Ну и конечно же перерывы на медитацию
+      в виде приготовления пасты карбонара:
+    </p>
+    <hr>
+    <div class="photo">
+      <nav class="navbar navbar-light" style="background-color: black">
+        <div class="container py-2">
+          <img src="{% static 'img/karbonara.jpg' %}" width="400" height="500"
+            class="d-inline-block align-top" alt="">
+        </div>
+      </nav>
+    </div>
+    <hr>
+  </div>
+  <div class="container py-4">
+    <div class="row">
+      <h2>Обратная связь</h2>
+      <aside class="col-12 col-md-3">
+        <ul class="list-group list-group-flush">
+          <li class="list-group-item">
+            <a class="navbar-brand">
+              <a class="navbar-brand" href=
+                "https://github.com/ValeryKorobov">
+                <img src="{% static 'img/git.png' %}" width="30" height="30"
+                  class="d-inline-block align-top" alt="">
+                <span style="color:black">Мои проекты</span>
+              </a>
+            </a>
+          </li>
+          <li class="list-group-item">
+            <a class="navbar-brand">
+              <a class="navbar-brand" href=
+                "https://vk.com/askmehowhm">
+                <img src="{% static 'img/vk.png' %}" width="30" height="30"
+                  class="d-inline-block align-top" alt="">
+                <span style="color:black">Вконтакте</span>
+              </a>
+            </a>
+          </li>
+          <li class="list-group-item">
+            <a class="navbar-brand">
+              <a class="navbar-brand" href=
+                "https://t.me/okkkli1">
+                <img src="{% static 'img/tg.png' %}" width="30" height="30"
+                  class="d-inline-block align-top" alt="">
+                <span style="color:black">Телеграм</span>
+              </a>
+            </a>
+          </li>
+        </ul>
+      </aside>
+    </div>
+  </div>
+{% endblock %}

@@ -1,0 +1,22 @@
+{% extends 'base.html' %}
+{% block title %}
+  Авторы на которых вы подписаны.
+{% endblock %}
+{% block content %}
+  <div class="container py-5">
+    <h1>Авторы на которых вы подписаны</h1>
+    {% include 'posts/includes/switcher.html' %}
+      {% for post in page_obj %}
+        {% include 'includes/post_card.html' %}
+        {% if post.group %}
+          <a href=
+            "{% url 'posts:group_list' post.group.slug %}">
+              {% include 'posts/includes/pictures.html' %}
+              все записи группы
+          </a>
+        {% endif %}
+        {% if not forloop.last %}<hr>{% endif %}
+      {% endfor %}
+    {% include 'posts/includes/paginator.html' %}
+  </div>
+{% endblock %}

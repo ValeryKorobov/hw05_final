@@ -1,0 +1,79 @@
+{% extends "base.html" %}
+{% load static %}
+{% block title %}Технологии{% endblock %}
+{% block content %}
+  <div class="container py-4">
+    <div class="row">
+      <h1>Вот что я знаю:</h1>
+      <aside class="col-12 col-md-3">
+        <ul class="list-group list-group-flush">
+          <li class="list-group-item">
+            <a class="navbar-brand">
+              <img src="{% static 'img/py.png' %}" width="30" height="30"
+                class="d-inline-block align-top" alt="">
+              <span style="color:black">Python</span>
+            </a>
+          </li>
+          <li class="list-group-item">
+            <a class="navbar-brand">
+              <img src="{% static 'img/django.png' %}" width="30" height="30"
+                class="d-inline-block align-top" alt="">
+              <span style="color:black">Django</span>
+            </a>
+          </li>
+          <li class="list-group-item">
+            <a class="navbar-brand">
+              <img src="{% static 'img/css.png' %}" width="30" height="30"
+                class="d-inline-block align-top" alt="">
+              <span style="color:black">Css</span>
+            </a>
+          </li>
+          <li class="list-group-item">
+            <a class="navbar-brand">
+              <img src="{% static 'img/html.png' %}" width="30" height="30"
+                class="d-inline-block align-top" alt="">
+              <span style="color:black">Html</span>
+            </a>
+          </li>
+          <li class="list-group-item">
+            <a class="navbar-brand">
+              <img src="{% static 'img/bash.png' %}" width="30" height="30"
+                class="d-inline-block align-top" alt="">
+              <span style="color:black">BASH</span>
+            </a>
+          </li>
+          <li class="list-group-item">
+            <a class="navbar-brand">
+              <img src="{% static 'img/sql.jpg' %}" width="30" height="30"
+                class="d-inline-block align-top" alt="">
+              <span style="color:black">SQLite</span>
+            </a>
+          </li>
+          <li class="list-group-item">
+            <a class="navbar-brand">
+              <img src="{% static 'img/bootstrap.png' %}" width="35" height="30"
+                class="d-inline-block align-top" alt="">
+              <span style="color:black">Bootstrap</span>
+            </a>
+          </li>
+        </ul>
+      </aside>
+      <article class="col-12 col-md-9">
+        <p>
+          В данном проекте применил знания в основном по работе с
+          базами данных SQLite, фильтрацию через ORM и немного css.
+          Разобрался в работе декораторов и применил @login_required
+          в функции аутентификации пользователей.
+        </p>
+        <p>
+          Трудно далось изучение и применение валидации форм, работа с формами
+          тяжело дается, так что последнее задание решил отчасти интуитивно.
+          Но радует что решил и что есть примерно понимание работы форм,
+          моделей и вьюшек, хотелось бы конечно больше опыта в этом получить
+          и самое главное получать более детальную информацию по таким сложным
+          темам.
+        </p>
+      </article>
+    </div>
+  </div>
+{% endblock %}

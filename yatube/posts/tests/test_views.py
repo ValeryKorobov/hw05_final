@@ -347,46 +347,6 @@ class PostPagesTest(TestCase):
                 except KeyError:
                     self.assertEqual(response.context['post'].image, data)
 
-    def test_post_comment_self_add(self):
-        """
-        После успешной отправки комментарий появляется
-        на странице своего же поста.
-
-        """
-        response = (self.authorized_client.get(reverse(
-                    'posts:post_detail',
-                    kwargs={'post_id': self.post.pk}
-                    )))
-        comment = response.context['comments'][FIRST_OBJECT_PAGE]
-        context_data = {
-            comment.created: self.comment.created,
-            comment.author: self.user,
-            comment.text: self.comment.text,
-        }
-        for context, data in context_data.items():
-            with self.subTest(data=data):
-                self.assertEqual(context, data)
-
-    def test_post_comment_author_add(self):
-        """
-        После успешной отправки комментарий появляется
-        на странице поста другого автора.
-
-        """
-        response = (self.authorized_client_author.get(reverse(
-                    'posts:post_detail',
-                    kwargs={'post_id': self.post.pk}
-                    )))
-        comment_auth = response.context['comments'][SECOND_OBJECT_PAGE]
-        context_data = {
-            comment_auth.created: self.comment_author.created,
-            comment_auth.author: self.user_author,
-            comment_auth.text: self.comment_author.text,
-        }
-        for context, data in context_data.items():
-            with self.subTest(data=data):
-                self.assertEqual(context, data)
-
     def test_post_comment_author_anon_user(self):
         """
         Комментарий анонимным юзером не создается.
@@ -557,7 +517,49 @@ class PostPagesTest(TestCase):
             reverse("posts:follow_index")
         )
 
-        self.assertFalse(len(response.context['page_obj']), ZERO_COUNT_OBJECTS)
+        self.assertFalse(
+            len(response.context['page_obj']), ZERO_COUNT_OBJECTS
+        )
+
+    def test_post_comment_self_add(self):
+        """
+        После успешной отправки комментарий появляется
+        на странице своего же поста.
+
+        """
+        response = (self.authorized_client.get(reverse(
+                    'posts:post_detail',
+                    kwargs={'post_id': self.post.pk}
+                    )))
+        comment = response.context['comments'][FIRST_OBJECT_PAGE]
+        context_data = {
+            comment.created: self.comment.created,
+            comment.author: self.user,
+            comment.text: self.comment.text,
+        }
+        for context, data in context_data.items():
+            with self.subTest(data=data):
+                self.assertEqual(context, data)
+
+    def test_post_comment_author_add(self):
+        """
+        После успешной отправки комментарий появляется
+        на странице поста другого автора.
+
+        """
+        response = (self.authorized_client_author.get(reverse(
+                    'posts:post_detail',
+                    kwargs={'post_id': self.post.pk}
+                    )))
+        comment_auth = response.context['comments'][SECOND_OBJECT_PAGE]
+        context_data = {
+            comment_auth.created: self.comment_author.created,
+            comment_auth.author: self.user_author,
+            comment_auth.text: self.comment_author.text,
+        }
+        for context, data in context_data.items():
+            with self.subTest(data=data):
+                self.assertEqual(context, data)
 
 
 class PaginatorViewsTest(TestCase):

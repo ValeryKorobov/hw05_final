@@ -117,12 +117,19 @@ def post_edit(request, post_id):
 def add_comment(request, post_id):
     post = get_object_or_404(Post, pk=post_id)
     form = CommentForm(request.POST or None)
+    comments = Comment.objects.select_related('author').filter(post=post)
     if form.is_valid():
         comment = form.save(commit=False)
         comment.author = request.user
         comment.post = post
         comment.save()
-    return redirect('posts:post_detail', post_id=post_id)
+        return redirect('posts:post_detail', post_id=post_id)
+    context = {
+        'post': post,
+        'form': form,
+        'comments': comments,
+    }
+    return render(request, 'posts/post_detail.html', context)
 
 
 @login_required

@@ -18,6 +18,7 @@ COUNT_POSTS_ON_SECOND_PAGE: int = 3
 NUMBER_OF_POSTS: int = 13
 ONE_FOLLOWER: int = 1
 FIRST_OBJECT_PAGE: int = 0
+SECOND_OBJECT_PAGE: int = 1
 ZERO_COUNT_OBJECTS: int = 0
 SMALL_GIF = (
     b'\x47\x49\x46\x38\x39\x61\x02\x00'
@@ -42,6 +43,11 @@ class PostPagesTest(TestCase):
         cls.user_not_author = User.objects.create(username='NotAuthor')
         cls.authorized_client_not_author = Client()
         cls.authorized_client_not_author.force_login(cls.user_not_author)
+
+        cls.user_author = User.objects.create(username='Author')
+        cls.authorized_client_author = Client()
+        cls.authorized_client_author.force_login(cls.user_author)
+
         cls.group = Group.objects.create(
             title='Тестовая группа',
             slug='test-slug',
@@ -61,6 +67,11 @@ class PostPagesTest(TestCase):
             post=cls.post,
             author=cls.user,
             text='Тестовый комментарий',
+        )
+        cls.comment_author = Comment.objects.create(
+            post=cls.post,
+            author=cls.user_author,
+            text='Тестовый комментарий автору другим пользователем',
         )
 
     def setUp(self) -> None:
@@ -98,11 +109,30 @@ class PostPagesTest(TestCase):
                 kwargs={'post_id': self.post.pk}
             ): 'posts/create_post.html',
             reverse('posts:post_create'): 'posts/create_post.html',
+            reverse(
+                'posts:add_comment',
+                kwargs={'post_id': self.post.pk}
+            ): 'posts/post_detail.html',
+            reverse('posts:follow_index'): 'posts/follow.html',
         }
         for reverse_name, template in templates_pages_names.items():
             with self.subTest(template=template):
                 response = self.authorized_client.get(reverse_name)
                 self.assertTemplateUsed(response, template)
+        templates_pages_names_not_used = {
+            reverse(
+                'posts:profile_follow',
+                kwargs={'username': self.user_author}
+            ): 'posts/profile.html',
+            reverse(
+                'posts:profile_unfollow',
+                kwargs={'username': self.user_author}
+            ): 'posts/profile.html',
+        }
+        for name, template_name in templates_pages_names_not_used.items():
+            with self.subTest(template_name=template_name):
+                response = self.authorized_client.get(name)
+                self.assertTemplateNotUsed(response, template_name)
 
     def test_pages_uses_correct_template_anon_user(self):
         """
@@ -137,6 +167,19 @@ class PostPagesTest(TestCase):
                 kwargs={'post_id': self.post.pk}
             ): 'posts/create_post.html',
             reverse('posts:post_create'): 'posts/create_post.html',
+            reverse(
+                'posts:add_comment',
+                kwargs={'post_id': self.post.pk}
+            ): 'posts/post_detail.html',
+            reverse('posts:follow_index'): 'posts/follow.html',
+            reverse(
+                'posts:profile_follow',
+                kwargs={'username': self.user_author}
+            ): 'posts/profile.html',
+            reverse(
+                'posts:profile_unfollow',
+                kwargs={'username': self.user_author}
+            ): 'posts/profile.html',
         }
         for reverse_name, template in templates_name_not_used_anon.items():
             with self.subTest(template=template):
@@ -304,9 +347,10 @@ class PostPagesTest(TestCase):
                 except KeyError:
                     self.assertEqual(response.context['post'].image, data)
 
-    def test_post_comment(self):
+    def test_post_comment_self_add(self):
         """
-        после успешной отправки комментарий появляется на странице поста.
+        После успешной отправки комментарий появляется
+        на странице своего же поста.
 
         """
         response = (self.authorized_client.get(reverse(
@@ -322,6 +366,43 @@ class PostPagesTest(TestCase):
         for context, data in context_data.items():
             with self.subTest(data=data):
                 self.assertEqual(context, data)
+
+    def test_post_comment_author_add(self):
+        """
+        После успешной отправки комментарий появляется
+        на странице поста другого автора.
+
+        """
+        response = (self.authorized_client_author.get(reverse(
+                    'posts:post_detail',
+                    kwargs={'post_id': self.post.pk}
+                    )))
+        comment_auth = response.context['comments'][SECOND_OBJECT_PAGE]
+        context_data = {
+            comment_auth.created: self.comment_author.created,
+            comment_auth.author: self.user_author,
+            comment_auth.text: self.comment_author.text,
+        }
+        for context, data in context_data.items():
+            with self.subTest(data=data):
+                self.assertEqual(context, data)
+
+    def test_post_comment_author_anon_user(self):
+        """
+        Комментарий анонимным юзером не создается.
+
+        """
+        comments_number_before = Comment.objects.count()
+        try:
+            Comment.objects.create(
+                post=self.post,
+                author=self.anonimus_client,
+                text='Тестовый комментарий автору анонимным юзером',
+            )
+        except ValueError:
+            pass
+        comments_number_after = Comment.objects.count()
+        self.assertEqual(comments_number_before, comments_number_after)
 
     def test_cache_on_index_page(self):
         """
@@ -380,6 +461,44 @@ class PostPagesTest(TestCase):
                 "posts:profile_unfollow", args=[self.user_not_author.username]
             )
         )
+
+    def test_profile_not_follow_author_self(self):
+        """
+        Автор не может подписываться на самого себя.
+
+        """
+        followers_number_before = Follow.objects.count()
+        self.authorized_client.get(
+            reverse(
+                "posts:profile_follow", args=[self.user.username]
+            )
+        )
+        followers_number_after = Follow.objects.count()
+        count_users = {
+            followers_number_after: followers_number_before
+        }
+        for count_after, count_before in count_users.items():
+            with self.subTest(count_before=count_before):
+                self.assertEqual(count_after, count_before)
+        self.assertFalse(
+            Follow.objects.filter(
+                author=self.user,
+                user=self.user
+            ).exists())
+
+    def test_profile_not_follow_anon_user(self):
+        """
+        Гость не может подписываться на авторов.
+
+        """
+        followers_number_before = Follow.objects.count()
+        self.anonimus_client.get(
+            reverse(
+                "posts:profile_follow", args=[self.user_author.username]
+            )
+        )
+        followers_number_after = Follow.objects.count()
+        self.assertEqual(followers_number_after, followers_number_before)
 
     def test_profile_unfollow_authorized(self):
         """Авторизованный пользователь может отписываться от других

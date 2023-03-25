@@ -1,0 +1,73 @@
+{% extends "base.html" %}
+{% block title %}
+  {% if status == 500 %}
+    Internal Server Error 500
+  {% elif status == 501 %}
+    Not Implemented 501
+  {% elif status == 502 %}
+    Bad Gateway 502
+  {% elif status == 503 %}
+    Service Unavailable 503
+  {% elif status == 504 %}
+    Gateway Timeout 504
+  {% elif status == 505 %}
+    HTTP Version Not Supported 505
+  {% elif status == 506 %}
+    Variant Also Negotiates 506
+  {% elif status == 507 %}
+    Insufficient Storage 507
+  {% elif status == 508 %}
+    Loop Detected 508
+  {% elif status == 510 %}
+    Not Extended 510
+  {% elif status == 511 %}
+    Network Authentication Required 511
+  {% endif %}
+{% endblock %}
+{% block content %}
+  {% if status == 500 %}
+    <h1>Internal Server Error 500</h1>
+    <p></p>
+    <a href="{% url 'posts:index' %}">Идите на главную</a>
+  {% elif status == 501 %}
+    <h1>Not Implemented 501</h1>
+    <p></p>
+    <a href="{% url 'posts:index' %}">Идите на главную</a>
+  {% elif status == 502 %}
+    <h1>Bad Gateway 502</h1>
+    <p></p>
+    <a href="{% url 'posts:index' %}">Идите на главную</a>
+  {% elif status == 503 %}
+    <h1>Service Unavailable 503</h1>
+    <p></p>
+    <a href="{% url 'posts:index' %}">Идите на главную</a>
+  {% elif status == 504 %}
+    <h1>Gateway Timeout 504</h1>
+    <p></p>
+    <a href="{% url 'posts:index' %}">Идите на главную</a>
+  {% elif status == 505 %}
+    <h1>HTTP Version Not Supported 505</h1>
+    <p></p>
+    <a href="{% url 'posts:index' %}">Идите на главную</a>
+  {% elif status == 506 %}
+    <h1>Variant Also Negotiates 506</h1>
+    <p></p>
+    <a href="{% url 'posts:index' %}">Идите на главную</a>
+  {% elif status == 507 %}
+    <h1>Insufficient Storage 507</h1>
+    <p></p>
+    <a href="{% url 'posts:index' %}">Идите на главную</a>
+  {% elif status == 508 %}
+    <h1>Loop Detected 508</h1>
+    <p></p>
+    <a href="{% url 'posts:index' %}">Идите на главную</a>
+  {% elif status == 510 %}
+    <h1>Not Extended 510</h1>
+    <p></p>
+    <a href="{% url 'posts:index' %}">Идите на главную</a>
+  {% elif status == 511 %}
+    <h1>Network Authentication Required 511</h1>
+    <p></p>
+    <a href="{% url 'posts:index' %}">Идите на главную</a>
+  {% endif %}
+{% endblock %}

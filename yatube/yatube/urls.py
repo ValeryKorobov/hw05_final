@@ -31,6 +31,17 @@ urlpatterns = [
 
 handler404 = 'core.views.page_not_found'
 handler403 = 'core.views.csrf_failure'
+handler500 = 'core.views.internal_server_error'
+handler501 = 'core.views.not_implemented'
+handler502 = 'core.views.bad_gateway'
+handler503 = 'core.views.service_unavailable'
+handler504 = 'core.views.gateway_timeout'
+handler505 = 'core.views.http_version_not_supported'
+handler506 = 'core.views.variant_also_negotiates'
+handler507 = 'core.views.insufficient_storage'
+handler508 = 'core.views.loop_detected'
+handler510 = 'core.views.not_extended'
+handler511 = 'core.views.network_authentication_required'
 
 if settings.DEBUG:
     urlpatterns += static(

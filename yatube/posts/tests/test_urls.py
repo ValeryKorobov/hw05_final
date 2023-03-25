@@ -28,6 +28,13 @@ class StaticURLTests(TestCase):
             author=self.user,
             text='Тестовый пост',
         )
+        self.user_author = User.objects.create_user(username='Author')
+        self.authorized_author = Client()
+        self.authorized_client.force_login(self.user)
+        self.post_author = Post.objects.create(
+            author=self.user_author,
+            text='Тестовый пост автора',
+        )
         cache.clear()
 
     def tests_all_page(self):
@@ -41,6 +48,12 @@ class StaticURLTests(TestCase):
             '/profile/AuthUser/': HTTPStatus.OK.value,
             f'/posts/{self.post.pk}/': HTTPStatus.OK.value,
             '/unexisting_page/': HTTPStatus.NOT_FOUND.value,
+            f'/posts/{self.post.pk}/comment/': HTTPStatus.FOUND.value,
+            '/follow/': HTTPStatus.FOUND.value,
+            f'/profile/{self.user.username}/follow/': HTTPStatus.FOUND.value,
+            f'/profile/{self.user.username}/unfollow/': (
+                HTTPStatus.FOUND.value
+            ),
         }
         for address, url_status in url_adress.items():
             with self.subTest(url_status=url_status):
@@ -74,12 +87,22 @@ class StaticURLTests(TestCase):
             '/profile/AuthUser/': 'posts/profile.html',
             f'/posts/{self.post.pk}/': 'posts/post_detail.html',
             f'/posts/{self.post.pk}/edit/': 'posts/create_post.html',
-            '/create/': 'posts/create_post.html'
+            '/create/': 'posts/create_post.html',
+            f'/posts/{self.post.pk}/comment/': 'posts/post_detail.html',
+            '/follow/': 'posts/follow.html',
         }
         for address, template in templates_url_names.items():
             with self.subTest(address=address):
                 response = self.authorized_client.get(address)
                 self.assertTemplateUsed(response, template)
+        templates_url_not_used = {
+            f'/profile/{self.user.username}/follow/': 'posts/profile.html',
+            f'/profile/{self.user.username}/unfollow/': 'posts/profile.html',
+        }
+        for address_second, template_second in templates_url_not_used.items():
+            with self.subTest(template_second=template_second):
+                response = self.authorized_client.get(address_second)
+                self.assertTemplateNotUsed(response, template_second)
 
     def test_urls_uses_correct_template_anon_user(self):
         """
@@ -89,7 +112,7 @@ class StaticURLTests(TestCase):
         templates_url_names = {
             '/': 'posts/index.html',
             '/group/test-slug/': 'posts/group_list.html',
-            '/profile/AuthUser/': 'posts/profile.html',
+            f'/profile/{self.user.username}/': 'posts/profile.html',
             f'/posts/{self.post.pk}/': 'posts/post_detail.html',
         }
         for address, template in templates_url_names.items():
@@ -99,8 +122,54 @@ class StaticURLTests(TestCase):
         templates_url_not_used = {
             f'/posts/{self.post.pk}/edit/': 'posts/create_post.html',
             '/create/': 'posts/create_post.html',
+            f'/posts/{self.post.pk}/comment/': 'posts/post_detail.html',
+            '/follow/': 'posts/follow.html',
+            f'/profile/{self.user.username}/follow/': 'posts/profile.html',
+            f'/profile/{self.user.username}/unfollow/': 'posts/profile.html',
         }
         for address_second, template_second in templates_url_not_used.items():
             with self.subTest(template_second=template_second):
                 response = self.guest_client.get(address_second)
                 self.assertTemplateNotUsed(response, template_second)
+
+    def test_url_redirect_anonymous_on_login(self):
+        """
+        Страница перенаправит анонимного пользователя на страницу логина.
+
+        """
+        url_adress = {
+            f'/posts/{self.post.pk}/comment/': '/auth/login/?next=',
+            '/follow/': '/auth/login/?next=',
+            f'/profile/{self.user.username}/follow/': '/auth/login/?next=',
+            f'/profile/{self.user.username}/unfollow/': '/auth/login/?next=',
+        }
+        for address, url_status in url_adress.items():
+            with self.subTest(address=address):
+                response = self.guest_client.get(
+                    address,
+                    follow=True
+                )
+                self.assertRedirects(
+                    response, url_status + address
+                )
+
+    def test_url_redirect_authorized(self):
+        """
+        Страница перенаправит авторизованного юзера на страницу профиля.
+
+        """
+        url_adress = {
+            f'/profile/{self.user_author.username}/follow/': (
+                f'/profile/{self.user_author.username}/'),
+            f'/profile/{self.user_author.username}/unfollow/': (
+                f'/profile/{self.user_author.username}/'),
+        }
+        for address, url_status in url_adress.items():
+            with self.subTest(address=address):
+                response = self.authorized_client.get(
+                    address,
+                    follow=True
+                )
+                self.assertRedirects(
+                    response, url_status
+                )

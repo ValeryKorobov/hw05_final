@@ -18,7 +18,6 @@ COUNT_POSTS_ON_SECOND_PAGE: int = 3
 NUMBER_OF_POSTS: int = 13
 ONE_FOLLOWER: int = 1
 FIRST_OBJECT_PAGE: int = 0
-SECOND_OBJECT_PAGE: int = 1
 ZERO_COUNT_OBJECTS: int = 0
 SMALL_GIF = (
     b'\x47\x49\x46\x38\x39\x61\x02\x00'
@@ -63,17 +62,7 @@ class PostPagesTest(TestCase):
             slug='test-slug_2',
             description='Тестовое описание 2',
         )
-        cls.comment = Comment.objects.create(
-            post=cls.post,
-            author=cls.user,
-            text='Тестовый комментарий',
-        )
-        cls.comment_author = Comment.objects.create(
-            post=cls.post,
-            author=cls.user_author,
-            text='Тестовый комментарий автору другим пользователем',
-        )
-
+        
     def setUp(self) -> None:
         cache.clear()
 
@@ -527,15 +516,20 @@ class PostPagesTest(TestCase):
         на странице своего же поста.
 
         """
+        comment = Comment.objects.create(
+            post=self.post,
+            author=self.user,
+            text='Тестовый комментарий для своего поста',
+        )
         response = (self.authorized_client.get(reverse(
                     'posts:post_detail',
                     kwargs={'post_id': self.post.pk}
                     )))
         comment = response.context['comments'][FIRST_OBJECT_PAGE]
         context_data = {
-            comment.created: self.comment.created,
+            comment.created: comment.created,
             comment.author: self.user,
-            comment.text: self.comment.text,
+            comment.text: comment.text,
         }
         for context, data in context_data.items():
             with self.subTest(data=data):
@@ -547,15 +541,20 @@ class PostPagesTest(TestCase):
         на странице поста другого автора.
 
         """
+        comment = Comment.objects.create(
+            post=self.post,
+            author=self.user_author,
+            text='Тестовый комментарий для поста другого автора',
+        )
         response = (self.authorized_client_author.get(reverse(
                     'posts:post_detail',
                     kwargs={'post_id': self.post.pk}
                     )))
-        comment_auth = response.context['comments'][SECOND_OBJECT_PAGE]
+        comment_auth = response.context['comments'][FIRST_OBJECT_PAGE]
         context_data = {
-            comment_auth.created: self.comment_author.created,
+            comment_auth.created: comment.created,
             comment_auth.author: self.user_author,
-            comment_auth.text: self.comment_author.text,
+            comment_auth.text: comment.text,
         }
         for context, data in context_data.items():
             with self.subTest(data=data):

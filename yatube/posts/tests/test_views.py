@@ -62,7 +62,7 @@ class PostPagesTest(TestCase):
             slug='test-slug_2',
             description='Тестовое описание 2',
         )
-        
+
     def setUp(self) -> None:
         cache.clear()
 

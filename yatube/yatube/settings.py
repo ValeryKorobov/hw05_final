@@ -26,8 +26,10 @@ DEBUG = False
 CSRF_FAILURE_VIEW = 'core.views.csrf_failure'
 
 ALLOWED_HOSTS = [
-    'www.valerykoro.pythonanywhere.com',
-    'valerykoro.pythonanywhere.com',
+    'localhost',
+    '127.0.0.1',
+    '[::1]',
+    'testserver',
 ]
 
 # Application definition
@@ -59,8 +61,7 @@ MIDDLEWARE = [
 ]
 
 INTERNAL_IPS = [
-    'www.valerykoro.pythonanywhere.com',
-    'valerykoro.pythonanywhere.com',
+    '127.0.0.1',
 ]
 
 ROOT_URLCONF = 'yatube.urls'

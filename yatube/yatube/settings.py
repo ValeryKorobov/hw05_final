@@ -22,14 +22,12 @@ BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 SECRET_KEY = 'bu$5kj1m%j$n4dy_i9lpu^wxs67pix_26f8x&r!zr+4jv959p1'
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = False
 CSRF_FAILURE_VIEW = 'core.views.csrf_failure'
 
 ALLOWED_HOSTS = [
-    'localhost',
-    '127.0.0.1',
-    '[::1]',
-    'testserver',
+    'www.valerykoro.pythonanywhere.com',
+    'valerykoro.pythonanywhere.com',
 ]
 
 # Application definition
@@ -61,7 +59,8 @@ MIDDLEWARE = [
 ]
 
 INTERNAL_IPS = [
-    '127.0.0.1',
+    'www.valerykoro.pythonanywhere.com',
+    'valerykoro.pythonanywhere.com',
 ]
 
 ROOT_URLCONF = 'yatube.urls'
